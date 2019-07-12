@@ -210,7 +210,7 @@ class wavefunction:
 
             if v_ref<0 and step>5:
                 print('this is problematic.  NSize is probably too small')
-                print(' step:'+ str(step)+"  "+ str(v_ref)+ ' : ',+ str(float(N_size_step)/float(nSize))+ ' = '+ str(float(N_size_step))+'/'+str(float(nSize)))
+                print(' step:'+ str(step)+"  "+ str(v_ref)+ ' : '+ str(float(N_size_step)/float(nSize))+ ' = '+ str(float(N_size_step))+'/'+str(float(nSize)))
 
             vRefList.append(v_ref)
             population.append(N_size_step)
