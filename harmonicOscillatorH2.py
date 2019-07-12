@@ -75,7 +75,7 @@ for n in range(nReps):
     plt.xlim(0,nSteps)
     
     #plot normalized histogram of population's x value                                                          
-    hist, bin_edges = np.histogram(x0, bins = 100, range=(-1.5,1.5))
+    hist, bin_edges = np.histogram(x0, bins = 100)
     norm_hist = hist/x0.size
     
 
