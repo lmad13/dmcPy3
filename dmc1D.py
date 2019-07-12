@@ -38,11 +38,17 @@ class wavefunction:
         conversionFactor=1.000000000000000000/6.02213670000e23/9.10938970000e-28#1822.88839    in Atomic Units!!
         massH=1.00782503223
         massLi=7.0
+        massO=15.994915
         if molecule=='H2':
-            massAtom=massH
+            massAtom1=massH
+            massAtom2=massH
         elif molecule=='Li2':
-            massAtom=massLi
-        return (massAtom*massAtom)/(massAtom+massAtom)*conversionFactor
+            massAtom1=massLi
+            massAtom2=massLi
+        elif molecule=='H2H2O':
+            massAtom1=massH+massH
+            massAtom2=massH+massH+massO
+        return (massAtom1*massAtom2)/(massAtom1+massAtom2)*conversionFactor
 
     def getTheoreticalOmega0(self):
         if self.potential=='harmonic':
@@ -82,7 +88,11 @@ class wavefunction:
             v[mask]=inf
         elif self.potential=='half harmonic':
             v=0.5*k*(x*x)
-
+        elif self.potential=='morse':
+            De=0.000628
+            Re=6.01 # define x as x=r-re
+            Alpha=0.777
+            v=De*(1.0-np.exp(-Alpha*(x)))**2
         return v
 
 
@@ -160,7 +170,7 @@ class wavefunction:
                     if weight>10:
                         #this really shouldn't happen
                         print('weight is too big, resetting to 10')
-                        print(x[n],v(n),'<',v_ref, -(v(n)-v_ref))
+                        print(str(x[n])+" "+str(v(n))+" "+'<'+" "+str(v_ref)+" "+ " "+str(-(v(n)-v_ref)))
                         weight=10
                     addBirthtot=addBirthtot+weight
 
@@ -189,9 +199,9 @@ class wavefunction:
                 v_ref=v_average+(self.alpha*(1.00-float(N_size_step)/float(nSize)))
             if printCensus: print('('+ str(N_size_step)+' / '+ str(nSize)+') v_ref '+ str(v_ref)+ ' = ' + str(v_average)+ ' + '+ str(self.alpha*(1-float(N_size_step)/float(nSize))))
 
-            if v_ref<0 and step>5:
-                print('this is problematic.  NSize is probably too small')
-                print(' step:'+ str(step)+"  "+ str(v_ref)+ ' : ',+ str(float(N_size_step)/float(nSize))+ ' = '+ str(float(N_size_step))+'/'+str(float(nSize)))
+            if v_ref<0 and step>50:
+                print('V_ref: '+str(v_ref)+'<0. This is problematic.  NSize is probably too small')
+                print(' step:'+ str(step)+"  "+ str(v_ref)+ ' : '+ str(float(N_size_step)/float(nSize))+ ' = '+ str(float(N_size_step))+'/'+str(float(nSize)))
 
             vRefList.append(v_ref)
             population.append(N_size_step)
