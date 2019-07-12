@@ -10,9 +10,9 @@ au2wn=219474.63
 
 
 #The number of walkers
-nWalkers=2000
+nWalkers=10000
 
-H2Wfn=dmc.wavefunction(nWalkers,'Morse',plotting=True)
+H2Wfn=dmc.wavefunction(nWalkers,'Morse',plotting=False)
 
 TheoreticalOmega0=H2Wfn.getTheoreticalOmega0()
 
@@ -37,7 +37,11 @@ print('The time step is ' +str(H2Wfn.dtau))
 H2Wfn.setX(H2Wfn.xcoords+6.2)
 
 #first equilibrate:
-v,pop,x0Equilibration,d=H2Wfn.propagate(H2Wfn.xcoords,nEquilibrationSteps)
+v,pop,x0Equilibration,d=H2Wfn.propagate(H2Wfn.xcoords,nEquilibrationSteps,plotWalkers=False,printFlag=False)
+
+x0combined = []
+bincombined = np.empty(0)
+
 
 #then simulate n times:
 for n in range(nReps):
@@ -47,6 +51,59 @@ for n in range(nReps):
     print("Repetition: " + str(n))
     print("Average Energy:")
     print(np.average(vref_0))
-    
+    print(x0)
+#plot vref_0 over time in comparison to v avarage                                                             
 
-    
+    plt.figure(1)
+    steps = np.array([i+1 for i in range(nSteps)])
+    steps = np.array([i+1 for i in range(nSteps)])
+    plt.scatter(steps, vref_0, label='V ref for run {}'.format(n+1), s=700/nSteps)
+
+    #modify ticks                                                                                        
+    preticks = steps
+    mod = preticks % 100 == 0
+    ticks = preticks[mod]
+
+    plt.xticks(ticks)
+    plt.axhline(y = np.average(vref_0), color='{}'.format(1.0/(2**(n+1))),label='V average for run {}: {}'.format(n+1,np.average(vref_0)))
+    plt.xlabel('Step')
+    plt.ylabel('V')
+    plt.title('V ref over time for {} Runs'.format(nReps))
+    plt.legend(loc='best')
+    plt.xlim(0,nSteps)
+
+    #plot normalized histogram of population's x value                                                                                                                                                                 
+    hist, bin_edges = np.histogram(x0, bins = 100)
+    norm_hist = hist/x0.size
+
+
+    plt.figure(2)
+    plt.plot((bin_edges[:-1]+bin_edges[1:])/2, norm_hist,'o',color='{}'.format(1.0/(2**(n+1))), label='Run #{}'.format(n+1))
+    plt.xlabel('x (Bohr)')
+    plt.ylabel('frequency')
+    plt.grid()
+    plt.title('Wavefunction for {} Runs'.format(nReps))
+    plt.legend(loc='best')
+
+
+    #cumulative histogram                                                                                     
+    #cum_hist = np.cumsum(norm_hist)                                                                          
+    cum_hist = np.cumsum(norm_hist)
+    plt.figure(3)
+    plt.plot(bin_edges[:-1], cum_hist,'o',color='{}'.format(1.0/(2**(n+1))), label='Run#{}'.format(n+1))
+    plt.xlabel('x (Bohr)')
+    plt.ylabel('frequency')
+    plt.grid()
+    plt.title('Cumulative Wavefunction for {} Runs'.format(nReps))
+    plt.legend(loc='best')
+
+
+    #combine x0 to whole list                                                                                 
+    x0combined.append(norm_hist)
+    #bincombined = np.concatenate((bincombined, bin_edges))                                                   
+x0combined=np.array(x0combined)
+avgnormedhist = np.average(x0combined,axis=0)
+plt.figure(2)
+plt.plot((bin_edges[:-1]+bin_edges[1:])/2,avgnormedhist)
+
+plt.show()
