@@ -2,29 +2,32 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 au2wn=219474.63
+
+
 class wavefunction:
     
     def __init__(self,nWalkers,potential,plotting=False,omegaInput=2000.00,molecule='H2'):
-        print("initialized",nWalkers," coordinates for",potential)
+        print("initialized"+str(nWalkers)+" coordinates for " +str(potential))
         self.potential=potential
         self.xcoords=np.zeros((nWalkers))
         self.dtau=self.set_dtau()
-        self.D=.5
+        self.D=0.5
         self.mass=self.set_mass(molecule)
         self.omega=omegaInput
-        print('reduced mass is', self.mass)
+        print('reduced mass is '+str(self.mass))
         self.sigma_dx=(2.0*self.D*self.dtau/self.mass)**0.5
-        print('sigma_dx',self.sigma_dx)
+        print('sigma_dx'+str(self.sigma_dx))
         self.mu_dx=0.0
         self.alpha=0.500/self.dtau
         self.plotting=plotting
         self.recrossing=True if 'half harmonic' in potential else False
-        print('recrossing is ', self.recrossing)
+        print('recrossing is '+ str(self.recrossing))
+
     def setX(self,x):
         self.xcoords=x
 
     def set_dtau(self):
-        print('set dtau to be ',10.0)
+        print('set dtau to be '+ str(10.0))
         return 10.0
     def get_dtau(self):
         
@@ -41,7 +44,7 @@ class wavefunction:
             massAtom=massLi
         return (massAtom*massAtom)/(massAtom+massAtom)*conversionFactor
 
-    def getIdealVref(self):
+    def getTheoreticalOmega0(self):
         if self.potential=='harmonic':
             return self.omega/(2.0*au2wn)
         
@@ -52,7 +55,7 @@ class wavefunction:
         k=(self.omega*2.0*np.pi*3.0*10**(10))**2*self.mass #cm-1                                            
         convfactor=9.10938291e-31*(1.0/4.35974417e-18)*(5.2917721092e-11)**2     #kg/amu Eh/J  m**2/Bh**2   
         k=k*convfactor
-        #print 'my k is ', k
+
         alpha=np.sqrt(k*self.mass)
         return alpha
 
@@ -105,7 +108,7 @@ class wavefunction:
             x=x+dx
             v=self.V(x)
             if step%(500) and printFlag:
-                print('step: ', step, end=' ')
+                print('step: '+ str(step))
                 sys.stdout.flush()
             if self.plotting and step%(nSteps/10)==0:
                 plt.scatter(x,v)
@@ -121,7 +124,7 @@ class wavefunction:
             nDeaths=np.sum(np.array(Diff<0).astype(int))
             survivors=x[mask_survive]
             
-            if printCensus: print('Census: Deaths:',nDeaths, end=' ') 
+            if printCensus: print('Census: Deaths:'+ str(nDeaths))
 
             #recrossing correction for pop near node, only true for half harmonic PES
             if self.recrossing:
@@ -140,7 +143,7 @@ class wavefunction:
             #Creation of a random selection of walkers in the classically allowed region
             P_exp_b=np.exp(-(v-v_ref)*self.dtau)-1.0
             P_exp_b[np.logical_not(mask_survive)]=0.000000 #BECAUSE THE DEAD CANNOT REPRODUCE!! NO ZOMBIE MOTHERS!! 
-            if printCensus: print('\n P_exp_b',np.average(P_exp_b[(P_exp_b>0)]),np.std(P_exp_b[(P_exp_b>0)]))
+            if printCensus: print('\n P_exp_b'+ str(np.average(P_exp_b[(P_exp_b>0)]))+"  "+ str(np.std(P_exp_b[(P_exp_b>0)])))
             weight_P_b=P_exp_b.astype(int)
             P_b=P_exp_b-weight_P_b            #classically allowed region
             #P_b[np.logical_not(mask_survive)]=0.0
@@ -166,7 +169,7 @@ class wavefunction:
                     new_pop=np.concatenate((new_pop,temp))
                     new_pop_whoYaFrom=np.concatenate((new_pop_whoYaFrom,temp_whoYaFrom))
 
-            if printCensus: print('. Births:',nBirths, ". Add' births: ", addBirthtot)
+            if printCensus: print('. Births:'+ str(nBirths)+ ". Add' births: "+ str( addBirthtot))
             if plotWalkers:
                 plt.scatter(x[mask_survive],v[mask_survive],c='black')
                 plt.scatter(x[mask_b],v[mask_b],c='blue',s=(P_exp_b[mask_b]*100.0)**2)
@@ -184,11 +187,11 @@ class wavefunction:
             v_average=np.average(self.V(new_population))
             if not setV_ref:
                 v_ref=v_average+(self.alpha*(1.00-float(N_size_step)/float(nSize)))
-            if printCensus: print('(',N_size_step,'/',nSize,') v_ref',v_ref, '=', v_average,'+', (self.alpha*(1-float(N_size_step)/float(nSize))))
+            if printCensus: print('('+ str(N_size_step)+' / '+ str(nSize)+') v_ref '+ str(v_ref)+ ' = ' + str(v_average)+ ' + '+ str(self.alpha*(1-float(N_size_step)/float(nSize))))
 
             if v_ref<0 and step>5:
                 print('this is problematic.  NSize is probably too small')
-                print(' step:',step, v_ref, ':',float(N_size_step)/float(nSize), '=', float(N_size_step),'/',float(nSize))
+                print(' step:'+ str(step)+"  "+ str(v_ref)+ ' : ',+ str(float(N_size_step)/float(nSize))+ ' = '+ str(float(N_size_step))+'/'+str(float(nSize)))
 
             vRefList.append(v_ref)
             population.append(N_size_step)
