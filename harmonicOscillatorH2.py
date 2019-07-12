@@ -107,25 +107,6 @@ x0combined=np.array(x0combined)
 avgnormedhist = np.average(x0combined,axis=0)
 plt.figure(2)
 plt.plot((bin_edges[:-1]+bin_edges[1:])/2,avgnormedhist)
-#plot average of all histograms
-#plt.figure()
-#comb_hist, comb_bin_edges = np.histogram(x0combined, bins=100)
-#avg_hist = comb_hist/nReps
-#avg_comb_bin_edges = comb_bin_edges/nReps
-#norm_avg_hist = avg_hist/comb_hist.size
-
-
-#plt.plot(avg_comb_bin_edges[:-1], avg_hist, 'o')    
-#plt.xlabel('x (Bohr)')
-#plt.ylabel('frequency')
-#plt.grid()
-#plt.title('Averaged Wavefunction for {} Runs'.format(nReps))
-
-#plot cumulative average of all histograms
-#plt.figure()
-#cum_comb_hist = np.cumsum(avg_hist)
-#plt.plot(comb_bin_edges[:-1], cum_comb_hist, 'o')
-
 
 plt.show()
 
