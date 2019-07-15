@@ -1,52 +1,94 @@
-import  dmc1D as dmc
+import dmc1Dmorse as dmc
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
-
-
-#Conversion factor of atomic units of energy to wavenumber (inverse centimeters)
 au2wn=219474.63
 
+nWalkers=10000
 
-#The number of walkers
-nWalkers=2000
+H2Wfn=dmc.wavefunction(nWalkers,'Morse',plotting=False)
 
-H2H2OWfn=dmc.wavefunction(nWalkers,'morse',molecule='H2H2O')
+TheoreticalOmega0=H2Wfn.getTheoreticalOmega0()
+print('the theoretical frequency for H2 vibration is: '+str(TheoreticalOmega0)+\
+' cm^-1')
 
-#TheoreticalOmega0=H2Wfn.getTheoreticalOmega0()
+nReps=3
+nEquilibrationSteps=1200
+nSteps=2000
 
-#print('the theoretical frequency for H2 vibration is: '+str(TheoreticalOmega0)+' cm^-1')
-
-#Important parameters for the MC simulation
-nReps=3  #Repeat the DMC simulation 3 times
-nEquilibrationSteps=1000 #Initially equilibrate the simulation with 12000 diffusion steps 
-nSteps=2000  #Make 2000 Diffusion steps in each simulation
-
-nDesSteps=75  
-nRepsDW=5
+nDesSteps=75
+nRepsDW=2000
 
 print('important parameters:')
 
 print('Equilibrating for '+str(nEquilibrationSteps))
 print('The number of diffusion steps in the simulation is '+str(nSteps))
-print('The time step is ' +str(H2H2OWfn.dtau))
+print('The time step is ' +str(H2Wfn.dtau))
 
+H2Wfn.setX(H2Wfn.xcoords+6.2)
 
-H2H2OWfn.setX(H2H2OWfn.xcoords+.2)
+#first equilibrate:                                                             
+v,pop,x0Equilibration,d=H2Wfn.propagate(H2Wfn.xcoords,nEquilibrationSteps,plotWalkers=False,printFlag=False)
 
-#first equilibrate:
-v,pop,x0Equilibration,d=H2H2OWfn.propagate(H2H2OWfn.xcoords,nEquilibrationSteps)
+vref_0,pop,x0,d=H2Wfn.propagate(x0Equilibration,nSteps)
+vref_0=np.array(vref_0)
+print("Repetition: 0")
+print("Average Energy:")
+print(np.average(vref_0))
 
-#then simulate n times:
-for n in range(nReps):
-    #propagate
-    vref_0,pop,x0,d=H2H2OWfn.propagate(x0Equilibration,nSteps)
+hist, bin_edges = np.histogram(x0, bins = 100)
+norm_hist = hist/x0.size
+norm_bin = (bin_edges[:-1]+bin_edges[1:])/2
+
+plt.figure(1)
+plt.plot(norm_bin, norm_hist,'o',color='{}'.format(1.0/(2**(1))), label='Run #{}'.format(1))
+
+cum_hist = np.cumsum(norm_hist)
+plt.figure(2)
+plt.plot(norm_bin, cum_hist,'o',color='{}'.format(1.0/(2**(1))), label='Run#{}'.format(1))
+
+hiscombined = norm_hist
+
+for n in range(nReps-1):
+    vref_0,pop,x0,d=H2Wfn.propagate(x0Equilibration,nSteps)
     vref_0=np.array(vref_0)
-    print("Repetition: " + str(n))
+    print("Repetition: " + str(n+1))
     print("Average Energy:")
     print(np.average(vref_0))
-    print(str(np.average(vref_0)*(219474.63))+" cm-1")
-    
+    print(x0)
 
-    
+    hist, bin_edges = np.histogram(x0, bins = bin_edges)
+    norm_hist = hist/x0.size
+    norm_bin = (bin_edges[:-1]+bin_edges[1:])/2
+    plt.figure(1)
+    plt.plot(norm_bin, norm_hist,'o',color='{}'.format(1.0/(2**(n+2))), label='Run #{}'.format(n+2))
+
+    newhiscombined = hiscombined + norm_hist
+    hiscombined = newhiscombined
+
+    cum_hist = np.cumsum(norm_hist)
+    plt.figure(2)
+    plt.plot(norm_bin, cum_hist,'o',color='{}'.format(1.0/(2**(n+2))), label='Run#{}'.format(n+2))
+
+avgnormedhist = hiscombined/3
+plt.figure(1)
+plt.plot(norm_bin,avgnormedhist)
+
+plt.figure(1)
+plt.xlabel('x (Bohr)')
+plt.ylabel('frequency')
+plt.grid()
+plt.title('Cumulative Wavefunction for {} Runs'.format(nReps))
+plt.legend(loc='best')
+
+plt.figure(2)
+plt.xlabel('x (Bohr)')
+plt.ylabel('frequency')
+plt.grid()
+plt.title('Wavefunction for {} Runs'.format(nReps))
+plt.legend(loc='best')
+
+
+plt.show()
+
