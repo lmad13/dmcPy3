@@ -90,7 +90,6 @@ for n in range(nReps-1):
     print("Repetition: " + str(n+1))
     print("Average Energy:")
     print(np.average(vref_0))
-    print(x0)
 #plot vref_0 over time in comparison to v avarage                                                             
     plt.figure(4)
     steps = np.array([i+1 for i in range(nSteps)])
