@@ -52,12 +52,14 @@ norm_bin = (bin_edges[:-1]+bin_edges[1:])/2
 
 plt.figure(1)
 plt.plot(norm_bin, norm_hist,'o',color='{}'.format(1.0/(2**(1))), label='Run #{}'.format(1))
+plt.grid()
 
 #graph cumulative histogram of x0
 cum_hist = np.cumsum(norm_hist)
 
 plt.figure(2)
 plt.plot(norm_bin, cum_hist,'o',color='{}'.format(1.0/(2**(1))), label='Run#{}'.format(1))
+plt.grid()
 hiscombined = norm_hist
 
 #graph vref vs time steps
@@ -70,6 +72,9 @@ preticks = steps
 mod = preticks % 100 == 0
 ticks = preticks[mod]
 
+#graph psi squared
+plt.figure(4)
+plt.plot(norm_bin, norm_hist**2,'o',color='{}'.format(1.0/(2**(1))), label='Run #{}'.format(1))
 
 #then simulate n times:
 for n in range(nReps-1):
@@ -90,6 +95,11 @@ for n in range(nReps-1):
     norm_bin = (bin_edges[:-1]+bin_edges[1:])/2
     plt.figure(1)
     plt.plot(norm_bin, norm_hist,'o',color='{}'.format(1.0/(2**(n+2))), label='Run #{}'.format(n+2))
+    plt.grid()
+#plot psi squared
+    plt.figure(4)
+    plt.plot(norm_bin, norm_hist**2,'o',color='{}'.format(1.0/(2**(n+2))), label='Run#{}'.format(n+2))
+    plt.grid()
 
     newhiscombined = hiscombined + norm_hist
     hiscombined = newhiscombined
@@ -97,17 +107,31 @@ for n in range(nReps-1):
     cum_hist = np.cumsum(norm_hist)
     plt.figure(2)
     plt.plot(norm_bin, cum_hist,'o',color='{}'.format(1.0/(2**(n+2))), label='Run#{}'.format(n+2))
+    plt.grid()
 
+
+
+#graph averaged histogram
 avgnormedhist = hiscombined/3
 plt.figure(1)
-plt.plot(norm_bin,avgnormedhist)
-plt.figure(1)
+plt.plot(norm_bin,avgnormedhist, label='Avg Psi')
 plt.xlabel('x (Bohr)')
 plt.ylabel('frequency')
 plt.grid()
 plt.title('Cumulative Wavefunction for {} Runs'.format(nReps))
 plt.legend(loc='best')
 
+#graph psi squared
+plt.figure(4)
+plt.plot(norm_bin,avgnormedhist**2, label='Avg Psi Squared')
+plt.figure(1)
+plt.xlabel('x (Bohr)')
+plt.ylabel('Probability')
+plt.grid()
+plt.title('Cumulative Wavefunction for {} Runs'.format(nReps))
+plt.legend(loc='best')
+
+#graphed cumulative histogram
 plt.figure(2)
 plt.xlabel('x (Bohr)')
 plt.ylabel('frequency')
@@ -115,6 +139,7 @@ plt.grid()
 plt.title('Wavefunction for {} Runs'.format(nReps))
 plt.legend(loc='best')
 
+#graph vref
 plt.figure(3)
 plt.xticks(ticks)
 plt.axhline(y = np.average(vref_0), color='{}'.format(1.0/(2**(1))),label='V average for run {}: {}'.format(1,np.average(vref_0)))
