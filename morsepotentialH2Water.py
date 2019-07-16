@@ -150,7 +150,7 @@ bx1.legend(loc='best')
 
 #graph cumulative histsqrt
 bx2.set_xlabel('x (Bohr)')
-bx2.set_label('Probability')
+bx2.set_ylabel('Probability')
 bx2.grid()
 bx2.set_title('Integrate Psi Squared for {} Runs'.format(nReps))
 bx2.legend(loc='best')
