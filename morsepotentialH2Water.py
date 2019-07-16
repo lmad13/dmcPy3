@@ -110,7 +110,7 @@ for n in range(nReps-1):
 #plot psi squared
     histsqrt = (hist**2)
     norm_histsqrt =histsqrt/np.sum(histsqrt)
-    ax2.plot(norm_bin, norm_histsqrt,'o',color='{}'.format(1.0/(2**(n+2))), label='Run#{}'.format(n+2))
+    ax2.plot(norm_bin, norm_histsqrt,'o',color='{}'.format(1.0/(2**(n+2))), label='Run #{}'.format(n+2))
 
     newhistsqrtcombined = histsqrtcombined + norm_histsqrt
     histsqrtcombined = newhistsqrtcombined
