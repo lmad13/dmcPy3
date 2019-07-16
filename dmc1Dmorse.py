@@ -184,7 +184,7 @@ class wavefunction:
                     addBirthtot=addBirthtot+weight
 
                     temp=np.tile(particle,weight)
-                    temp_whoYaFrom=np.tile(whoYaFrom[p],weight)
+                    temp_whoYaFrom=np.tile(whoYaFrom[n],weight)
                     new_pop=np.concatenate((new_pop,temp))
                     new_pop_whoYaFrom=np.concatenate((new_pop_whoYaFrom,temp_whoYaFrom))
 
