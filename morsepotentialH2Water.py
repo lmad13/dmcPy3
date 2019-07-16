@@ -63,7 +63,7 @@ bx1 = fig2.add_subplot(121)
 bx1.plot(norm_bin, cum_hist,'o',color='{}'.format(1.0/(2**(1))), label='Run#{}'.format(1))
 
 #graph vref vs time steps
-plt.figure(4)
+plt.figure(3)
 steps = np.array([i+1 for i in range(nSteps)])
 plt.scatter(steps, vref_0, label='V ref for run {}'.format(1), s=700/nSteps)
 
@@ -94,7 +94,7 @@ for n in range(nReps-1):
     print("Average Energy:")
     print(np.average(vref_0))
 #plot vref_0 over time in comparison to v avarage                                                             
-    plt.figure(4)
+    plt.figure(3)
     steps = np.array([i+1 for i in range(nSteps)])
     plt.scatter(steps, vref_0, label='V ref for run {}'.format(2+n), s=700/nSteps)
     #plot normalized histogram of population's x value                                                                                                                                                                 
@@ -157,7 +157,7 @@ bx2.legend(loc='best')
 
 
 #graph vref
-plt.figure(4)
+plt.figure(3)
 plt.xticks(ticks)
 plt.axhline(y = np.average(vref_0), color='{}'.format(1.0/(2**(1))),label='V average for run {}: {}'.format(1,np.average(vref_0)))
 plt.xlabel('Step')
