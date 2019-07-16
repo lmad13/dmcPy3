@@ -50,20 +50,20 @@ hist, bin_edges = np.histogram(x0, bins = 100)
 norm_hist = hist/x0.size
 norm_bin = (bin_edges[:-1]+bin_edges[1:])/2
 
-plt.figure(1)
+plt.figure(2)
 plt.plot(norm_bin, norm_hist,'o',color='{}'.format(1.0/(2**(1))), label='Run #{}'.format(1))
 plt.grid()
 
 #graph cumulative histogram of x0
 cum_hist = np.cumsum(norm_hist)
 
-plt.figure(2)
+plt.figure(3)
 plt.plot(norm_bin, cum_hist,'o',color='{}'.format(1.0/(2**(1))), label='Run#{}'.format(1))
 plt.grid()
 hiscombined = norm_hist
 
 #graph vref vs time steps
-plt.figure(3)
+plt.figure(4)
 steps = np.array([i+1 for i in range(nSteps)])
 plt.scatter(steps, vref_0, label='V ref for run {}'.format(1), s=700/nSteps)
 
@@ -73,7 +73,7 @@ mod = preticks % 100 == 0
 ticks = preticks[mod]
 
 #graph psi squared
-plt.figure(4)
+plt.figure(1)
 plt.plot(norm_bin, norm_hist**2,'o',color='{}'.format(1.0/(2**(1))), label='Run #{}'.format(1))
 
 #then simulate n times:
@@ -86,26 +86,27 @@ for n in range(nReps-1):
     print(np.average(vref_0))
     print(x0)
 #plot vref_0 over time in comparison to v avarage                                                             
-    plt.figure(3)
+    plt.figure(4)
     steps = np.array([i+1 for i in range(nSteps)])
     plt.scatter(steps, vref_0, label='V ref for run {}'.format(2+n), s=700/nSteps)
     #plot normalized histogram of population's x value                                                                                                                                                                 
     hist, bin_edges = np.histogram(x0, bins = bin_edges)
     norm_hist = hist/x0.size
     norm_bin = (bin_edges[:-1]+bin_edges[1:])/2
-    plt.figure(1)
+    plt.figure(2)
     plt.plot(norm_bin, norm_hist,'o',color='{}'.format(1.0/(2**(n+2))), label='Run #{}'.format(n+2))
     plt.grid()
 #plot psi squared
-    plt.figure(4)
+    plt.figure(1)
     plt.plot(norm_bin, norm_hist**2,'o',color='{}'.format(1.0/(2**(n+2))), label='Run#{}'.format(n+2))
     plt.grid()
 
     newhiscombined = hiscombined + norm_hist
     hiscombined = newhiscombined
-
+    
+    #plot cumulative hist
     cum_hist = np.cumsum(norm_hist)
-    plt.figure(2)
+    plt.figure(3)
     plt.plot(norm_bin, cum_hist,'o',color='{}'.format(1.0/(2**(n+2))), label='Run#{}'.format(n+2))
     plt.grid()
 
@@ -113,7 +114,7 @@ for n in range(nReps-1):
 
 #graph averaged histogram
 avgnormedhist = hiscombined/3
-plt.figure(1)
+plt.figure(2)
 plt.plot(norm_bin,avgnormedhist, label='Avg Psi')
 plt.xlabel('x (Bohr)')
 plt.ylabel('frequency')
@@ -122,7 +123,7 @@ plt.title('Cumulative Wavefunction for {} Runs'.format(nReps))
 plt.legend(loc='best')
 
 #graph psi squared
-plt.figure(4)
+plt.figure(1)
 plt.plot(norm_bin,avgnormedhist**2, label='Avg Psi Squared')
 plt.figure(1)
 plt.xlabel('x (Bohr)')
@@ -132,7 +133,7 @@ plt.title('Cumulative Wavefunction for {} Runs'.format(nReps))
 plt.legend(loc='best')
 
 #graphed cumulative histogram
-plt.figure(2)
+plt.figure(3)
 plt.xlabel('x (Bohr)')
 plt.ylabel('frequency')
 plt.grid()
@@ -140,7 +141,7 @@ plt.title('Wavefunction for {} Runs'.format(nReps))
 plt.legend(loc='best')
 
 #graph vref
-plt.figure(3)
+plt.figure(4)
 plt.xticks(ticks)
 plt.axhline(y = np.average(vref_0), color='{}'.format(1.0/(2**(1))),label='V average for run {}: {}'.format(1,np.average(vref_0)))
 plt.xlabel('Step')
