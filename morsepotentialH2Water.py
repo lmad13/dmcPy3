@@ -52,15 +52,13 @@ norm_bin = (bin_edges[:-1]+bin_edges[1:])/2
 
 plt.figure(2)
 plt.plot(norm_bin, norm_hist,'o',color='{}'.format(1.0/(2**(1))), label='Run #{}'.format(1))
-plt.grid()
+hiscombined = norm_hist
 
 #graph cumulative histogram of x0
 cum_hist = np.cumsum(norm_hist)
 
 plt.figure(3)
 plt.plot(norm_bin, cum_hist,'o',color='{}'.format(1.0/(2**(1))), label='Run#{}'.format(1))
-plt.grid()
-hiscombined = norm_hist
 
 #graph vref vs time steps
 plt.figure(4)
@@ -73,8 +71,16 @@ mod = preticks % 100 == 0
 ticks = preticks[mod]
 
 #graph psi squared
+histsqrt = (hist**2)
+norm_histsqrt = histsqrt/np.sum(histsqrt)
 plt.figure(1)
-plt.plot(norm_bin, norm_hist**2,'o',color='{}'.format(1.0/(2**(1))), label='Run #{}'.format(1))
+plt.plot(norm_bin, norm_histsqrt,'o',color='{}'.format(1.0/(2**(1))), label='Run #{}'.format(1))
+histsqrtcombined = norm_histsqrt
+
+#plot cumulative histsqrt                                                                                                     
+cum_histsqrt = np.cumsum(norm_histsqrt)
+plt.figure(5)
+plt.plot(norm_bin, cum_histsqrt,'o',color='{}'.format(1.0/(2**(1))), label='Run#{}'.format(1))
 
 #then simulate n times:
 for n in range(nReps-1):
@@ -95,25 +101,33 @@ for n in range(nReps-1):
     norm_bin = (bin_edges[:-1]+bin_edges[1:])/2
     plt.figure(2)
     plt.plot(norm_bin, norm_hist,'o',color='{}'.format(1.0/(2**(n+2))), label='Run #{}'.format(n+2))
-    plt.grid()
-#plot psi squared
-    plt.figure(1)
-    plt.plot(norm_bin, norm_hist**2,'o',color='{}'.format(1.0/(2**(n+2))), label='Run#{}'.format(n+2))
-    plt.grid()
 
     newhiscombined = hiscombined + norm_hist
     hiscombined = newhiscombined
+
+#plot psi squared
+    histsqrt = (hist**2)
+    norm_histsqrt =histsqrt/np.sum(histsqrt)
+    plt.figure(1)
+    plt.plot(norm_bin, norm_histsqrt,'o',color='{}'.format(1.0/(2**(n+2))), label='Run#{}'.format(n+2))
+
+    newhistsqrtcombined = histsqrtcombined + norm_histsqrt
+    histsqrtcombined = newhistsqrtcombined
+
+    
     
     #plot cumulative hist
     cum_hist = np.cumsum(norm_hist)
     plt.figure(3)
     plt.plot(norm_bin, cum_hist,'o',color='{}'.format(1.0/(2**(n+2))), label='Run#{}'.format(n+2))
-    plt.grid()
 
-
+    #plot cumulative histsqrt
+    cum_histsqrt = np.cumsum(norm_histsqrt)
+    plt.figure(5)
+    plt.plot(norm_bin, cum_histsqrt,'o',color='{}'.format(1.0/(2**(n+2))), label='Run#{}'.format(n+2))
 
 #graph averaged histogram
-avgnormedhist = hiscombined/3
+avgnormedhist = hiscombined/nReps
 plt.figure(2)
 plt.plot(norm_bin,avgnormedhist, label='Avg Psi')
 plt.xlabel('x (Bohr)')
@@ -123,13 +137,14 @@ plt.title('Cumulative Wavefunction for {} Runs'.format(nReps))
 plt.legend(loc='best')
 
 #graph psi squared
+avgnormedhistsqrt = histsqrtcombined/nReps
 plt.figure(1)
-plt.plot(norm_bin,avgnormedhist**2, label='Avg Psi Squared')
+plt.plot(norm_bin,avgnormedhistsqrt, label='Avg Psi Squared')
 plt.figure(1)
 plt.xlabel('x (Bohr)')
 plt.ylabel('Probability')
 plt.grid()
-plt.title('Cumulative Wavefunction for {} Runs'.format(nReps))
+plt.title('Cumulative Probability for {} Runs'.format(nReps))
 plt.legend(loc='best')
 
 #graphed cumulative histogram
@@ -137,8 +152,17 @@ plt.figure(3)
 plt.xlabel('x (Bohr)')
 plt.ylabel('frequency')
 plt.grid()
-plt.title('Wavefunction for {} Runs'.format(nReps))
+plt.title('Integrate Psi for {} Runs'.format(nReps))
 plt.legend(loc='best')
+
+#graph cumulative histsqrt
+plt.figure(5)
+plt.xlabel('x (Bohr)')
+plt.ylabel('Probability')
+plt.grid()
+plt.title('Integrate Psi Squared for {} Runs'.format(nReps))
+plt.legend(loc='best')
+
 
 #graph vref
 plt.figure(4)
