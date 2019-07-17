@@ -59,7 +59,7 @@ hist, bin_edges = np.histogram(x0, bins = 100)
 norm_hist = hist/x0.size
 norm_bin = (bin_edges[:-1]+bin_edges[1:])/2
 
-ax1 = fig1.add_subplot(121)
+ax1 = fig1.add_subplot(221)
 ax1.plot(norm_bin, norm_hist,'o',color='{}'.format(1.0/(2**(1))), label='Run #{}'.format(1))
 hiscombined = norm_hist
 
@@ -84,7 +84,7 @@ histsqrt, sqrtbin_edges = np.histogram(x0, bins=bin_edges, weights=descendants)
 norm_hist2 = histsqrt * norm_hist
 norm_histsqrt = norm_hist2/np.sum(norm_hist2) 
 
-ax2 = fig1.add_subplot(122)
+ax2 = fig1.add_subplot(222)
 ax2.plot(norm_bin, norm_histsqrt,'o',color='{}'.format(1.0/(2**(1))), label='Run #{}'.format(1))
 histsqrtcombined = norm_histsqrt
 
@@ -180,5 +180,14 @@ plt.title('V ref over time for {} Runs'.format(nReps))
 plt.legend(loc='best')
 plt.xlim(0,nSteps)
 
+#graph two avg's into one plot
+ax3 = fig1.add_subplot(212)
+ax3.plot(norm_bin,avgnormedhist, label='Avg Psi')
+ax3.plot(norm_bin,avgnormedhistsqrt, label='Avg Psi Squared')
+ax3.set_xlabel('x (Bohr)')
+ax3.set_ylabel('frequency')
+ax3.grid()
+ax3.set_title('Cumulative Psi and Psi^2 for {} Runs'.format(nReps))
+ax3.legend(loc='best')
 
 plt.show()
