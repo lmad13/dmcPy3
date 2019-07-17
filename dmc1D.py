@@ -1,18 +1,19 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+
 au2wn=219474.63
 
 
 class wavefunction:
     
-    def __init__(self,nWalkers,potential,plotting=False,omegaInput=2000.00,molecule='H2'):
+    def __init__(self,nWalkers,potential,plotting=False,omegaInput=2000.00,molecule1='H2',molecule2='H2O'):
         print("initialized"+str(nWalkers)+" coordinates for " +str(potential))
         self.potential=potential
         self.xcoords=np.zeros((nWalkers))
         self.dtau=self.set_dtau()
         self.D=0.5
-        self.mass=self.set_mass(molecule)
+        self.mass=self.set_mass(molecule1, molecule2)
         self.omega=omegaInput
         print('reduced mass is '+str(self.mass))
         self.sigma_dx=(2.0*self.D*self.dtau/self.mass)**0.5
@@ -33,21 +34,26 @@ class wavefunction:
         
         return self.dtau
 
-    def set_mass(self,molecule):
+    def set_mass(self,molecule1, molecule2):
         #why? for reduced mass in amu
         conversionFactor=1.000000000000000000/6.02213670000e23/9.10938970000e-28#1822.88839    in Atomic Units!!
         massH=1.00782503223
         massLi=7.0
         massO=15.994915
-        if molecule=='H2':
-            massAtom1=massH
-            massAtom2=massH
-        elif molecule=='Li2':
-            massAtom1=massLi
-            massAtom2=massLi
-        elif molecule=='H2H2O':
-            massAtom1=massH+massH
-            massAtom2=massH+massH+massO
+        if molecule1=='H2':
+            massAtom1=massH*2
+        elif molecule1=='Li2':
+            massAtom1=massLi*2
+        elif molecule1=='H2O':
+            massAtom1=massO+massH*2
+        
+        if molecule2=='H2':
+            massAtom2=massH*2
+        elif molecule2=='Li2':
+            massAtom2=massLi*2
+        elif molecule2=='H2O':
+            massAtom2=massO+massH*2
+
         return (massAtom1*massAtom2)/(massAtom1+massAtom2)*conversionFactor
 
     def getTheoreticalOmega0(self):
@@ -70,8 +76,13 @@ class wavefunction:
         k=(self.omega*2.0*np.pi*3.0*10**(10))**2*self.mass #cm-1
         convfactor=9.10938291e-31*(1.0/4.35974417e-18)*(5.2917721092e-11)**2     #kg/amu Eh/J  m**2/Bh**2
         k=k*convfactor
+        
+        #input for Morse
+        De=0.0006282580763580562
+        a=0.7778857095313176
+        re=6.014059847428283
+
         if self.potential=='harmonic':
-            
             v=0.5*k*(x*x)
         if self.potential=='half harmonic right':
             #v=0.5*k*(x*x) if x>0 else 100000
@@ -86,13 +97,11 @@ class wavefunction:
             v=0.5*k*(x*x)
             mask=(x>0.0)
             v[mask]=inf
+        if self.potential=='Morse':
+            v=De*((1-np.exp(-1.0*a*(x-re)))**2)
         elif self.potential=='half harmonic':
             v=0.5*k*(x*x)
-        elif self.potential=='morse':
-            De=0.000628
-            Re=6.01 # define x as x=r-re
-            Alpha=0.777
-            v=De*(1.0-np.exp(-Alpha*(x)))**2
+
         return v
 
 
@@ -170,12 +179,12 @@ class wavefunction:
                     if weight>10:
                         #this really shouldn't happen
                         print('weight is too big, resetting to 10')
-                        print(str(x[n])+" "+str(v(n))+" "+'<'+" "+str(v_ref)+" "+ " "+str(-(v(n)-v_ref)))
+                        print(x[n],v[n],'<',v_ref, -(v[n]-v_ref))
                         weight=10
                     addBirthtot=addBirthtot+weight
 
                     temp=np.tile(particle,weight)
-                    temp_whoYaFrom=np.tile(whoYaFrom[p],weight)
+                    temp_whoYaFrom=np.tile(whoYaFrom[n],weight)
                     new_pop=np.concatenate((new_pop,temp))
                     new_pop_whoYaFrom=np.concatenate((new_pop_whoYaFrom,temp_whoYaFrom))
 
@@ -199,8 +208,8 @@ class wavefunction:
                 v_ref=v_average+(self.alpha*(1.00-float(N_size_step)/float(nSize)))
             if printCensus: print('('+ str(N_size_step)+' / '+ str(nSize)+') v_ref '+ str(v_ref)+ ' = ' + str(v_average)+ ' + '+ str(self.alpha*(1-float(N_size_step)/float(nSize))))
 
-            if v_ref<0 and step>50:
-                print('V_ref: '+str(v_ref)+'<0. This is problematic.  NSize is probably too small')
+            if v_ref<0 and step>5:
+                print('this is problematic.  NSize is probably too small')
                 print(' step:'+ str(step)+"  "+ str(v_ref)+ ' : '+ str(float(N_size_step)/float(nSize))+ ' = '+ str(float(N_size_step))+'/'+str(float(nSize)))
 
             vRefList.append(v_ref)
@@ -220,11 +229,6 @@ class wavefunction:
         N_size_step=x.shape[0]
         dx=np.random.normal(self.mu_dx, self.sigma_dx, N_size_step)
         return dx
-
-#function CalcDesc
-#calculate descendant weights
-#take in walker positions, V, nsteps, delta t         
-#return the number of descendants
 
 
 
