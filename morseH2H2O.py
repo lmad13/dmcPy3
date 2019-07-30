@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
+#test of Morse
 
 #Conversion factor of atomic units of energy to wavenumber (inverse centimeters)
 au2wn=219474.63
