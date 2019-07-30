@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
-
+#graph psi squared with different time steps
 #Conversion factor of atomic units of energy to wavenumber (inverse centimeters)
 au2wn=219474.63
 
@@ -71,5 +71,5 @@ plt.legend(loc='best')
 plt.xlabel('x (Bohr)')
 plt.ylabel('Probability')
 plt.grid()
-plt.title('Psi Squared wight different steps')
+plt.title('Psi Squared With Different Steps')
 plt.show()
