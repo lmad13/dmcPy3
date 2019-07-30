@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
-
+#plot V average vs # of Walkers
 #Conversion factor of atomic units of energy to wavenumber (inverse centimeters)
 au2wn=219474.63
 
@@ -80,16 +80,10 @@ print('std', stdvavg)
 
 plt.figure()
 plt.errorbar(correctwalkers, vavg, yerr=stdvavg, color='orange', ecolor='green', capsize = 5, capthick=2, fmt='o')
-#plt.plot(correctwalkers, vavg, 'o')
 plt.xlabel('Number of Walkers')
 plt.ylabel('V average')
 plt.title('V average vs # of Walkers')
 
-#plt.figure()
-#plt.plot(correctwalkers, stdvavg, 'o')
-#plt.xlabel('Number of Walkers')
-#plt.ylabel('Std V average')
-#plt.title('Std V average vs # of Walkers')
 
 
 plt.show()
