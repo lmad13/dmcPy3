@@ -38,12 +38,14 @@ H2Wfn.setX(H2Wfn.xcoords+6.2)
 
 #first equilibrate:
 v,pop,x0Equilibration,d=H2Wfn.propagate(H2Wfn.xcoords,nEquilibrationSteps,plotWalkers=False,printFlag=False)
+print(H2Wfn.getTheoreticalOmega0())
 
 #propagate
 vref_0,pop,x0,d=H2Wfn.propagate(x0Equilibration,nSteps)
 vref_0=np.array(vref_0)
 print("Repetition: 0")
 print("Average Energy:")
+print(np.average(vref_0))
 
 
 
@@ -104,7 +106,8 @@ cum_histsqrt = np.cumsum(norm_histsqrt)
 #bx2 = fig2.add_subplot(122)
 #bx2.plot(norm_bin, cum_histsqrt,'o',color='{}'.format(1.0/(2**(1))), label='Run#{}'.format(1))
 
-vrefavg = []
+##initialize array to collect vref avgs with vref from first run 
+vrefavg = [np.average(vref_0)]
 #then simulate n times:
 for n in range(nReps-1):
     #propagate
