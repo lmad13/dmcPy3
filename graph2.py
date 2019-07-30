@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-#graph psi, psi squared, potential energy surface of Morse fit using hardcoded in values
+#graph psi, psi squared, potential energy surface of Harmonic oscillator fit using hardcoded in values
 
 #potential energy surface
 scfdone='4.41984094e-03 3.24723008e-03 2.25502089e-03 1.44321337e-03 8.11807520e-04 3.60803342e-04 9.02008356e-05 9.02008356e-05 3.60803342e-04 8.11807520e-04 1.44321337e-03 2.25502089e-03 3.24723008e-03 4.41984094e-03'
