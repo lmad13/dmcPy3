@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
+#graph v average vs. dtau with standard deviations
 
 #Conversion factor of atomic units of energy to wavenumber (inverse centimeters)                              
 au2wn=219474.63
