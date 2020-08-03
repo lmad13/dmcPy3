@@ -7,13 +7,13 @@ au2wn=219474.63
 
 class wavefunction:
     
-    def __init__(self,nWalkers,potential,plotting=False,omegaInput=0.00057161,molecule1='CH4',molecule2='H2O'):
+    def __init__(self,nWalkers,potential,plotting=False,omegaInput=0.00057161,molecule1='H2',molecule2='H2O',molecule3='H2O'):
         print("initialized"+str(nWalkers)+" coordinates for " +str(potential))
         self.potential=potential
         self.xcoords=np.zeros((nWalkers))
         self.dtau=self.set_dtau()
         self.D=0.5
-        self.mass=self.set_mass(molecule1, molecule2)
+        self.mass=self.set_mass(molecule1, molecule2, molecule3)
         self.omega=omegaInput
         print('reduced mass is '+str(self.mass))
         self.sigma_dx=(2.0*self.D*self.dtau/self.mass)**0.5
@@ -34,13 +34,14 @@ class wavefunction:
         
         return self.dtau
 
-    def set_mass(self,molecule1, molecule2):
+    def set_mass(self,molecule1, molecule2, molecule3):
         #why? for reduced mass in amu
         conversionFactor=1.000000000000000000/6.02213670000e23/9.10938970000e-28#1822.88839    in Atomic Units!!
         massH=1.00782503223
         massLi=7.0
         massO=15.994915
         massC=12.000000
+        
         if molecule1=='H2':
             massAtom1=massH*2
         elif molecule1=='Li2':
@@ -58,8 +59,15 @@ class wavefunction:
             massAtom2=massLi*2
         elif molecule2=='H2O':
             massAtom2=massO+massH*2
+        
+        if molecule3=='H2':
+            massAtom3=massH*2
+        elif molecule3=='Li2':
+            massAtom3=massLi*2
+        elif molecule3=='H2O':
+            massAtom3=massO+massH*2
 
-        return (massAtom1*massAtom2)/(massAtom1+massAtom2)*conversionFactor
+        return (massAtom1*massAtom2*massAtom3)/(massAtom1+massAtom2+massAtom3)*conversionFactor
 
     def getTheoreticalOmega0(self):
         if self.potential=='harmonic':
@@ -86,6 +94,12 @@ class wavefunction:
         De=0.0023164143974554563
         a=0.7228166340696739
         re=6.8463039861977375
+        
+        qa=0.09223635938249808
+        qb=-2.973531354477643*10**(-8)
+        qc=0.0747096550705948
+        qd=3.178170582263107*10**(-8)
+        qe=0.00034241789678879364
 
         if self.potential=='harmonic':
             v=0.5*k*(x*x)
@@ -104,6 +118,9 @@ class wavefunction:
             v[mask]=inf
         if self.potential=='Morse':
             v=De*((1-np.exp(-1.0*a*(x-re)))**2)
+            
+        if self.potential=='Quartic':
+            v=qa*(x**4)+qb*(x**3)+qc*(x**2)+qd*(x)+qe
         elif self.potential=='half harmonic':
             v=0.5*k*(x*x)
 
@@ -183,7 +200,7 @@ class wavefunction:
                 if weight>0: #i.e. the dead can't reproduce
                     if weight>10:
                         #this really shouldn't happen
-                        print('weight is too big, resetting to 10')
+                        print('weight is too big, resetting to 10. The weight is ',weight, ". The time step is ", step)
                         print(x[n],v[n],'<',v_ref, -(v[n]-v_ref))
                         weight=10
                     addBirthtot=addBirthtot+weight
