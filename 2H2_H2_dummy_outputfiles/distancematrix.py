@@ -52,17 +52,15 @@ def get_coords(outputFile):
 
 coords = get_coords(fileName)
 num_rows, num_cols, num_ind = coords.shape
-print(coords[1,1])
-
 
 def get_rijmatrix(coordmatrix, numb_rows, numb_atoms):
     coordmatrix = coordmatrix
     numbruns = numb_rows
     numbatoms = numb_atoms
-    emptyrijmatrix = [[0.0]*numbatoms for i in range(numbatoms)]
-    emptyrijmatrix = np.array(emptyrijmatrix)
     for run in range(numbruns):
         print("Scan number ", run)
+        emptyrijmatrix = [[0.0]*numbatoms for i in range(numbatoms)]
+        emptyrijmatrix = np.array(emptyrijmatrix)
         for i in range(numbatoms):
             for j in range(numbatoms):
                 ix = coordmatrix[run, i, 0]
@@ -74,10 +72,11 @@ def get_rijmatrix(coordmatrix, numb_rows, numb_atoms):
 
                 distance = np.sqrt((ix-jx)**2+(iy-jy)**2+(iz-jz)**2)
                 emptyrijmatrix[i,j]=distance
+        print(emptyrijmatrix)
                 
-    return emptyrijmatrix
+    return
                 
           
-print(get_rijmatrix(coords, num_rows, numbatoms))
+get_rijmatrix(coords, num_rows, numbatoms)
 
             
