@@ -20,35 +20,35 @@ numbatoms = input("How many atoms are in your input besides the dummy atom? ")
 numbatoms = int(numbatoms)
     
 def get_coords(outputFile):
-        readFile = open(outputFile,'r')
-        elementLookUp = ['X', 'H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar', 'X']
-        countdown = 0
-        scfcount = 0  
-        runcount = 0
-        coordscol = []
+    readFile = open(outputFile,'r')
+    elementLookUp = ['X', 'H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar', 'X']
+    countdown = 0
+    scfcount = 0  
+    runcount = 0
+    coordscol = []
 
 
-        for line in readFile:
-                if "Standard orientation:" in line:
-                        countdown = 6 + numbatoms
-                        scfcount += 1
-                        atomcount = 0
-                        runcount +=1
-                        coordsrow = [] 
-                if countdown > numbatoms:
-                        countdown = countdown - 1
-                if countdown <= numbatoms and countdown > 0:
-                        linelist = line.split()
-                        xyzcoords = [float(linelist[3]),float(linelist[4]),float(linelist[5])]
-                        coordsrow.append(xyzcoords)
-                        countdown = countdown - 1
-                        if countdown == 1:
-                            coordscol.append(coordsrow)
+    for line in readFile:
+        if "Standard orientation:" in line:
+            countdown = 6 + numbatoms
+            scfcount += 1
+            atomcount = 0
+            runcount +=1
+            coordsrow = [] 
+        if countdown > numbatoms:
+            countdown = countdown - 1
+        if countdown <= numbatoms and countdown > 0:
+            linelist = line.split()
+            xyzcoords = [float(linelist[3]),float(linelist[4]),float(linelist[5])]
+            coordsrow.append(xyzcoords)
+            countdown = countdown - 1
+            if countdown == 1:
+                coordscol.append(coordsrow)
                         
                         
 
-        readFile.close()
-        return np.array(coordscol)
+    readFile.close()
+    return np.array(coordscol)
 
 coords = get_coords(fileName)
 num_rows, num_cols, num_ind = coords.shape
