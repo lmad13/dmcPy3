@@ -73,9 +73,9 @@ def get_rijmatrix(coordmatrix, numb_rows, numb_atoms):
                 distance = np.sqrt((ix-jx)**2+(iy-jy)**2+(iz-jz)**2)
                 emptyrijmatrix[i,j]=distance
         print(emptyrijmatrix)
+        np.savetxt("distancematrix"+str(run)+".txt",emptyrijmatrix)
                 
     return
-                
           
 get_rijmatrix(coords, num_rows, numbatoms)
 
