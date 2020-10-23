@@ -31,6 +31,7 @@ class find_relationships:
 		readFile.close()
 		return self.guest_position_list
 	
+
 	def collect_SCF(self):
 	
 		readFile = open(self.fileName,'r')
@@ -121,12 +122,14 @@ class find_relationships:
 	plane_angle_degree = 180.0 - vector_angle_degree
 	print(plane_angle_degree)
 	
+
 	def center_of_plane(self, atom1, atom2, atom3, atom4, atom5):
 		x_com = (self.coords_array_last_set[atom1 - 1, 0] + self.coords_array_last_set[atom2 - 1, 0] + self.coords_array_last_set[atom3 - 1, 0] + self.coords_array_last_set[atom4 - 1, 0] + self.coords_array_last_set[atom5 - 1, 0]) / 5
 		y_com = (self.coords_array_last_set[atom1 - 1, 1] + self.coords_array_last_set[atom2 - 1, 1] + self.coords_array_last_set[atom3 - 1, 1] + self.coords_array_last_set[atom4 - 1, 1] + self.coords_array_last_set[atom5 - 1, 1]) / 5
 		z_com = (self.coords_array_last_set[atom1 - 1, 2] + self.coords_array_last_set[atom2 - 1, 2] + self.coords_array_last_set[atom3 - 1, 2] + self.coords_array_last_set[atom4 - 1, 2] + self.coords_array_last_set[atom5 - 1, 2]) / 5
 		self.center_of_plane = (x_com, y_com, z_com)
 		return self.center_of_plane
+
 
 	def center_of_cage(self):
 		water_x = []
