@@ -10,6 +10,10 @@
 
 
 import numpy as np
+import matplotlib.pyplot as plt
+
+
+
 def PotentialEnergyManyWaters(positions):
 	#This first finds the sum of the intramolecular energy (intRA) (energy due to atomic positions of atoms IN a molecule) and 
 	#sums them together.
@@ -39,14 +43,16 @@ def PotentialEnergyManyWaters(positions):
 	return potentialEnergy
 
 
-def qq(atom1, atom2, distance):
+def coloumbic(atom1, atom2, distance):
 	"""
 	Return q1q2/R
 
 	Parameters
 	------------
-	atom1: index number of atom 1
-	atom2: index number of atom 2
+	atom1: int.
+		index number of atom 1 (0: oxygen, 1: hydrogen, 1: hydrogen)
+	atom2: int.
+		index number of atom 2 (0: oxygen, 1: hydrogen, 1: hydrogen)
 	"""
 	q1 = 0
 	q2 = 0
@@ -61,8 +67,9 @@ def qq(atom1, atom2, distance):
 		q2 = -0.84
 	else:
 		q2 = 0.42
-
-	return q1*q2/distance
+	coloumbic1 = q1*q2/distance*(1.0/(4.0*np.pi))
+	
+	return coloumbic1
 
 
 def atomdistance(atom1, atom2):
@@ -75,6 +82,8 @@ def atomdistance(atom1, atom2):
 	atom2: numpy 1D array
 	"""
 	distancelist = np.zeros(atom1.size)
+
+	# go through every (x, y, z) coord in atom and calculate distance
 	for i in range(atom1.size):
 		axesdistance = atom1[i]-atom2[i]
 		distanceSquared = axesdistance ** 2
@@ -104,8 +113,18 @@ def PotentialEnergyTwoWaters(water1pos, water2pos):
 	epsilon = 0.1554252
 	sigma = 3.165492
 
+	# # conversion factors
+	# rOHeq=1.0 /0.529177 #equilibrium bond length in atomic units of distance
+	# kb= 1059.162 *(1.0/0.529177)**2 * (4.184/2625.5)# spring constant in atomic units of energy per (atomic units of distance)^2
+
+	# converted epsilon and sigma
+	epsilon = epsilon*(4.184/2625.5)
+	sigma = sigma/0.529177
+
 	# initialize potential energy list
 	potentialEnergyList = []
+	coloumbicEnergyList = []
+	lennardJonesList = []
 
 	# sort through atoms in water 1
 	for atomNum1 in range(nAtoms1):
@@ -113,29 +132,40 @@ def PotentialEnergyTwoWaters(water1pos, water2pos):
 		for atomNum2 in range(nAtoms2):
 			# obtain atom in water1
 			atom1 = water1pos[atomNum1]
+			print('ind atom1: ', atom1, "atom: ", atomNum1)
 			# obtain atom in water2
-			atom2 = water1pos[atomNum2]
+			atom2 = water2pos[atomNum2]
+			print('ind atom2: ', atom2, "atom: ", atomNum2)
 			# calculate atom atom distance
 			distance = atomdistance(atom1, atom2)
+			print(distance)
 			# if distance is not 0, calculate qiqj
-			if distance != 0:
-				qiqj = qq(atomNum1, atomNum2, distance)
+			if distance != 0.0:
+				coloumbicV = coloumbic(atomNum1, atomNum2, distance)
+				print(coloumbicV)
 				# if oxygen and oxygen
 				if atomNum1 == 0 and atomNum2 == 0:
-					potential = 4*0.1554252*((sigma/distance) - (sigma/distance))+qiqj/distance
+					lennardJones = 4*epsilon*((sigma/distance)**12 - (sigma/distance)**6)
+					potential = lennardJones + coloumbicV
 				# for every other combination
 				else:
-					potential = qiqj/distance
+					potential = coloumbicV
 				
+				print(potential)
 				potentialEnergyList.append(potential)
+				coloumbicEnergyList.append(coloumbicV)
+				lennardJonesList.append(lennardJones)
 
 	potentialEnergyList = np.array(potentialEnergyList)
+	coloumbicEnergyList = np.array(coloumbicEnergyList)
+	lennardJonesList = np.array(lennardJonesList)
 	# sum up all potential energies
 	VinterSum = np.sum(potentialEnergyList)
-	return VinterSum
+	coloumbicEnergySum = np.sum(coloumbicEnergyList)
+	lennardJonesSum = np.sum(lennardJonesList)
 
-				
 
+	return VinterSum, coloumbicEnergySum, lennardJonesSum
 
 
 	# return np.zeros(nWalkers1)
@@ -206,18 +236,18 @@ def PotentialEnergySingleWater(OHHpositions):
 	#(the norm of the OH vectors, for instance)
 
 #This is 3 walkers with three different configurations of the atoms
-print("Testing Potential for walkers with single water")
-sample1WaterWalkers=[[[0.0,0.0,0.0],[0.0,1.0,0.0],[0.0,0.0,3.0]],
-			[[0.0,0.0,0.0],[1.0,1.0,0.0],[0.0,1.0,1.0]],
-			[[0.0,0.0,0.0],[1.8897,0.0,0.0],[0.0,1.8897,0.0]]]
-# OHH
-sample1WaterWalkers=np.array(sample1WaterWalkers)
-print("Result: ", PotentialEnergySingleWater(sample1WaterWalkers))
-print("End test. \n \n")
+# print("Testing Potential for walkers with single water")
+# sample1WaterWalkers=[[[0.0,0.0,0.0],[0.0,1.0,0.0],[0.0,0.0,3.0]],
+# 			[[0.0,0.0,0.0],[1.0,1.0,0.0],[0.0,1.0,1.0]],
+# 			[[0.0,0.0,0.0],[1.8897,0.0,0.0],[0.0,1.8897,0.0]]]
+# # OHH
+# sample1WaterWalkers=np.array(sample1WaterWalkers)
+# print("Result: ", PotentialEnergySingleWater(sample1WaterWalkers))
+# print("End test. \n \n")
 
 
 
-print("Testing Potential for walkers with two waters")
+# print("Testing Potential for walkers with two waters")
 sample2WaterWalkers=[ 
 					[ [[0.0,0.0,0.0],[0.0,1.0,0.0],[0.0,0.0,3.0]], #Walker 1, water 1's positions
 					 [[0.0,0.0,0.0],[1.0,1.0,0.0],[0.0,1.0,1.0]] ], #Walker 1, water 2's positions
@@ -228,15 +258,9 @@ sample2WaterWalkers=[
 					[ [[1.0,0.0,0.0],[1.8897,0.0,0.0],[1.0,1.8897,0.0]], #Walker 3, water 1's positions
 					  [[0.0,0.0,1.0],[-1.8897,0.0,1.0],[-1.0,1.8897,1.0]] ], #Walker 3, water 2's positions
 					]
+
 sample2WaterWalkers=np.array(sample2WaterWalkers)
 
-print("Testing Potential for walkers with two waters")
-atom1 = [[0.0,0.0,0.0],[0.0,1.0,0.0],[0.0,0.0,3.0]]
-atom1 = np.array(atom1)
-atom2 = [[0.0,0.0,0.0],[1.0,1.0,0.0],[0.0,1.0,1.0]]
-atom2 = np.array(atom2)
-
-interPotential = PotentialEnergyTwoWaters(atom1, atom2)
-print(interPotential)
+	
 # print("Result: ",PotentialEnergyManyWaters(sample2WaterWalkers))
 print("End test. \n \n")
