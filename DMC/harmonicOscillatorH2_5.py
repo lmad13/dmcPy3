@@ -1,8 +1,7 @@
-import dmc1D as dmc
+import dmc1Dold as dmc
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
-from scipy.signal import chirp, find_peaks, peak_widths
 
 #plot on individual
 #Conversion factor of atomic units of energy to wavenumber (inverse centimeters)
@@ -11,13 +10,15 @@ au2wn=219474.63
 
 #The number of walkers
 nWalkers=10000
-H2Wfn=dmc.wavefunction(nWalkers,'harmonic',plotting=False)
+
+
+H2Wfn=dmc.Wavefunction(nWalkers,'half harmonic left',plotting=True)
 TheoreticalOmega0=H2Wfn.getTheoreticalOmega0()
 print('the theoretical frequency for H2 vibration is: '+str(TheoreticalOmega0)+' cm^-1')
 
 
 #Important parameters for the MC simulation
-nReps=20  #Repeat the DMC simulation 3 times
+nReps=5  #Repeat the DMC simulation 3 times
 nEquilibrationSteps=1200 #Initially equilibrate the simulation with 12000 diffusion steps 
 nSteps=2000  #Make 2000 Diffusion steps in each simulation
 
@@ -33,7 +34,7 @@ print('The number of diffusion steps in the simulation is '+str(nSteps))
 print('The time step is ' +str(H2Wfn.dtau))
 
 
-H2Wfn.setX(H2Wfn.xcoords+6.2)
+H2Wfn.setX(H2Wfn.xcoords-6.2)
 
 
 #first equilibrate:
@@ -108,6 +109,8 @@ cum_histsqrt = np.cumsum(norm_histsqrt)
 
 ##initialize array to collect vref avgs with vref from first run 
 vrefavg = [np.average(vref_0)]
+
+
 #then simulate n times:
 for n in range(nReps-1):
     #propagate
@@ -130,8 +133,8 @@ for n in range(nReps-1):
     norm_bin = ((bin_edges[:-1]+bin_edges[1:])/2)*0.529177249
     
     plt.figure(1)
-#    plt.plot(norm_bin, norm_hist,'o',color='{}'.format(1.0/(2**(n+2))), label='Run #{}'.format(n+2))
-#    plt.scatter(norm_bin, norm_hist, label='Run #{}'.format(n+2), s=70/nReps) 
+    #plt.plot(norm_bin, norm_hist,'o',color='{}'.format(1.0/(2**(n+2))), label='Run #{}'.format(n+2))
+    #plt.scatter(norm_bin, norm_hist, label='Run #{}'.format(n+2), s=70/nReps) 
     plt.scatter(norm_bin, norm_hist,s=20)
     newhiscombined = hiscombined + norm_hist
     hiscombined = newhiscombined
@@ -142,8 +145,8 @@ for n in range(nReps-1):
     norm_histsqrt = norm_hist2/np.sum(norm_hist2)
     
     plt.figure(2)
-#    plt.plot(norm_bin, norm_histsqrt,'o',color='{}'.format(1.0/(2**(n+2))), label='Run #{}'.format(n+2))
-#    plt.scatter(norm_bin, norm_histsqrt, label='Run #{}'.format(n+2), size=70/nReps)
+    #plt.plot(norm_bin, norm_histsqrt,'o',color='{}'.format(1.0/(2**(n+2))), label='Run #{}'.format(n+2))
+    #plt.scatter(norm_bin, norm_histsqrt, label='Run #{}'.format(n+2), size=70/nReps)
     plt.scatter(norm_bin, norm_histsqrt,s=20)
     newhistsqrtcombined = histsqrtcombined + norm_histsqrt
     histsqrtcombined = newhistsqrtcombined
@@ -167,7 +170,7 @@ for n in range(nReps-1):
 plt.figure(1)
 avgnormedhist = hiscombined/nReps
 plt.plot(norm_bin,avgnormedhist, label='Average Psi',linewidth=3,color='black')
-plt.xlabel('Bond Length (Angstrom)',size=30)
+plt.xlabel('Hydrogen-Water Bond Length (Angstrom)',size=30)
 plt.ylabel('Frequency',size=30)
 plt.grid()
 plt.title('Cumulative Psi for {} Runs'.format(nReps))
@@ -179,7 +182,7 @@ plt.legend(fontsize=20)
 avgnormedhistsqrt = histsqrtcombined/nReps
 plt.figure(2)
 plt.plot(norm_bin,avgnormedhistsqrt, label='Average Psi Squared',linewidth=3,color='black')
-plt.xlabel('Oxygen-Carbon Bond Length (Angstrom)',size=30)
+plt.xlabel('Hydrogen-Water Bond Length (Angstrom)',size=30)
 plt.ylabel('Probability',size=30)
 plt.grid()
 plt.title('Cumulative Psi^2 for {} Runs'.format(nReps))
@@ -227,7 +230,7 @@ avgnormedhistsqrt2 = histsqrtcombined2/nReps
 plt.figure(3)
 plt.plot(norm_bin,avgnormedhist, label='Avg Psi',linewidth=3)
 plt.plot(norm_bin,avgnormedhistsqrt, label='Avg Psi Squared',linewidth=3)
-plt.xlabel('Oxygen-Carbon Bond Length (Angstrom)',size=30)
+plt.xlabel('Hydrogen-Water Bond Length (Angstrom)',size=30)
 plt.ylabel('Frequency',size=30)
 plt.grid()
 plt.title('Cumulative Psi and Psi^2 for {} Runs'.format(nReps))

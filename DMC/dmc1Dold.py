@@ -1,75 +1,204 @@
+
+"""
+This is the dmc code I obtained from my GitHub library that contains all the old code. Because harmonicOscillatorH2_5
+stopped working somehow, I tried to see if this fixes anything. I added the probability of crossing over to thise code.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
+
 au2wn=219474.63
 
-
-class wavefunction:
+class Wavefunction:
     
-    def __init__(self,nWalkers,potential,plotting=False,omegaInput=0.00057161,molecule1='H2',molecule2='H2O',molecule3='H2O'):
+    def __init__(self, nWalkers, potential, plotting=False, dtau= 10.0, omegaInput=0.00057161, molecule1='H2', molecule2='H2O', molecule3='H2O', recrossing=True):
+        """
+        Wavefunction constructor.
+        Creates ...
+        
+        Parameters:
+        ---------------
+        nWalkers: int. Number of walkers
+        potential: str. Potential energy function (harmonic, half harmonic right, half harmonic left, Morse, Quartic, half harmonic)
+        plotting: bool. Whether not to plot (DEFAULT: False)
+        omegaInput: flt. Omega number for k (spring constant) (DEFAULT: 0.00057161)
+        dtau: flt. time step (DEFAULT: 10.0)
+        molecule1: str. atom/molecule 1 (DEFAULT: H2)
+        molecule2: str. atom/molecule 2 (DEFAULT: H20)
+        molecule3: str. atom/molecule 3 (DEFAULT: H20)
+        recrossing: bool. Choose to recross (DEFAULT: True)
+        """
+
+        # print statement for how many walkers and potential energy surface
         print("initialized"+str(nWalkers)+" coordinates for " +str(potential))
-        self.potential=potential
-        self.xcoords=np.zeros((nWalkers))
-        self.dtau=self.set_dtau()
-        self.D=0.5
+
+        # x coordinates
+        self.xcoords=np.zeros(nWalkers)
+        # set potential energy surface and print it out
+        self.potential=self.setPotential(potential)
+        # set time step and print it out
+        self.dtau=self.set_dtau(dtau)
+        # set reduced mass and print it out
         self.mass=self.set_mass(molecule1, molecule2, molecule3)
+        # set plot feature and print it out
+        self.plotting=self.setPlotting(plotting)
+        # set recrossing feature and print it out
+        self.recrossing=self.setRecrossing(recrossing)
+        
+        self.D=0.5
+        # Omega number for k (spring constant)
         self.omega=omegaInput
-        print('reduced mass is '+str(self.mass))
         self.sigma_dx=(2.0*self.D*self.dtau/self.mass)**0.5
         print('sigma_dx'+str(self.sigma_dx))
         self.mu_dx=0.0
         self.alpha=0.500/self.dtau
-        self.plotting=plotting
-        self.recrossing=True if 'half harmonic' in potential else False
-        print('recrossing is '+ str(self.recrossing))
 
-    def setX(self,x):
+
+    # get and set functions
+    def setPotential(self,potential):
+        """
+        Set potential energy from harmonic, half harmonic right, half harmonic left, Morse, Quartic, half harmonic
+        and print what it is
+
+        Parameters:
+        ---------------
+        potential: str. Potential energy function (harmonic, half harmonic right, half harmonic left, Morse, Quartic, half harmonic)
+        """
+        print('potential surface is '+ str(potential))
+        return potential
+
+
+    def setPlotting(self, plotting):
+        """
+        Set whether you want to plot or not
+        and print what it is
+
+        Parameters:
+        ---------------
+        plotting: bool. whether you want to plot or not
+        """
+        print('plotting is '+ str(plotting))
+        return plotting
+
+
+    def setRecrossing(self, recrossing):
+        """
+        Set whether you want to recross or not
+        and print what it is
+
+        Parameters:
+        ---------------
+        recrossing: bool. whether you want to recross or not
+        """
+        print('recrossing is '+ str(recrossing))
+        return recrossing
+        
+
+    def setX(self, x):
+        """
+        Set xcoords instance variable to x
+
+        Paramters:
+        ------------------
+        x: int. number of walkers
+        """
         self.xcoords=x
 
-    def set_dtau(self):
-        print('set dtau to be '+ str(10.0))
-        return 10.0
+
+    def set_dtau(self, dtau):
+        """
+        Set dtau instance variable as dtau
+
+        Paramters:
+        ------------------
+        dtau: flt. time step
+        """
+        print('set dtau to be '+ str(dtau))
+        return dtau
+
 
     def get_dtau(self):
+        """
+        Get dtau instance variable
+        """
         return self.dtau
 
-    def set_mass(self,molecule1, molecule2, molecule3):
+    def return_mass(self, molecule):
+        """
+        Obtain molecule and return reduced mass
+        Available: 'H2', 'Li2' , 'H2O', 'HO', 'CH4'    
+
+        Paramters:
+        -------------
+        molecule: str. Atomic 
+        """
         #why? for reduced mass in amu
         conversionFactor=1.000000000000000000/6.02213670000e23/9.10938970000e-28#1822.88839    in Atomic Units!!
+        
+        # mass of atoms used
+        massH=1.00782503223
+        massLi=7.0
+        massO=15.994915
+        massC=12.000000
+
+        # initialize massAtom
+        massAtom = 0
+
+        # set massAtom depending on the molecule
+        if molecule=='H2':
+            massAtom=massH*2
+        elif molecule=='Li2':
+            massAtom=massLi*2
+        elif molecule=='H2O':
+            massAtom=massO+massH*2
+        elif molecule=='HO':
+            massAtom=massO+massH
+        elif molecule=='CH4':
+            massAtom=massH*4+massC
+
+        return massAtom
+
+
+    def set_mass(self, molecule1, molecule2, molecule3):
+        """
+        Get reduced mass between different molecules
+        Available options: 'H2', 'Li2' , 'H2O', 'HO', 'CH4' 
+
+        Paramters:
+        --------------------
+        molecule1: str. atom/molecule 1 (DEFAULT: H2)
+        molecule2: str. atom/molecule 2 (DEFAULT: H20)
+        molecule3: str. atom/molecule 3 (DEFAULT: H20)
+        """
+
+        #why? for reduced mass in amu
+        conversionFactor=1.000000000000000000/6.02213670000e23/9.10938970000e-28#1822.88839    in Atomic Units!!
+        
+        # mass of atoms used
         massH=1.00782503223
         massLi=7.0
         massO=15.994915
         massC=12.000000
         
-        if molecule1=='H2':
-            massAtom1=massH*2
-        elif molecule1=='Li2':
-            massAtom1=massLi*2
-        elif molecule1=='H2O':
-            massAtom1=massO+massH*2
-        elif molecule1=='HO':
-            massAtom1=massO+massH
-        elif molecule1=='CH4':
-            massAtom1=massH*4+massC
-        
-        if molecule2=='H2':
-            massAtom2=massH*2
-        elif molecule2=='Li2':
-            massAtom2=massLi*2
-        elif molecule2=='H2O':
-            massAtom2=massO+massH*2
-        
-        if molecule3=='H2':
-            massAtom3=massH*2
-        elif molecule3=='Li2':
-            massAtom3=massLi*2
-        elif molecule3=='H2O':
-            massAtom3=massO+massH*2
+        # obtain reduced mass of each molecule
+        massAtom1 = self.return_mass(molecule1)
+        massAtom2 = self.return_mass(molecule2)
+        massAtom3 = self.return_mass(molecule3)
 
-        return (massAtom1*massAtom2*massAtom3)/(massAtom1+massAtom2+massAtom3)*conversionFactor
+        # reduced mass with conversino factor
+        reducedMass = (massAtom1*massAtom2*massAtom3)/(massAtom1+massAtom2+massAtom3)*conversionFactor
+        # print statement for reduced mass
+        print('reduced mass is '+str(reducedMass))
+        
+        return reducedMass
+
 
     def getTheoreticalOmega0(self):
+        """
+
+        """
         if self.potential=='harmonic':
             return self.omega/(2.0*au2wn)
         
@@ -84,11 +213,17 @@ class wavefunction:
         alpha=np.sqrt(k*self.mass)
         return alpha
 
+    def crossProb(self, originalx, newx):
+        insideNumerator = -2*self.mass*originalx*newx
+        output = np.exp(insideNumerator/self.dtau)  
+        return output      
+
+
     def V(self,x):
         #input in bohr, output in a.u.
-#        k=(self.omega*2.0*np.pi*3.0*10**(10))**2*self.mass #cm-1
-#        convfactor=9.10938291e-31*(1.0/4.35974417e-18)*(5.2917721092e-11)**2     #kg/amu Eh/J  m**2/Bh**2
-#        k=k*convfactor
+        #k=(self.omega*2.0*np.pi*3.0*10**(10))**2*self.mass #cm-1
+        #convfactor=9.10938291e-31*(1.0/4.35974417e-18)*(5.2917721092e-11)**2     #kg/amu Eh/J  m**2/Bh**2
+        #k=k*convfactor
         k = (self.omega**2)*self.mass
         #input for Morse
         De=0.0023164143974554563
@@ -146,20 +281,36 @@ class wavefunction:
 
         for step in range(nSteps):
             dx=self.diffuse(x)
+            originalx=x
             x=x+dx
+
+            # crossProbability = np.exp(-2.0*(x-dx)*x*np.sqrt(self.mass*self.mass)/self.dtau) # this is the old probability of recrossing 
+            crossProbability = self.crossProb(originalx, x) # has exponential function? this is the new probability of recrossing based on "Diffusion Monte Carlo in Internal Coordinates"
+            # print(crossProbability)
+            #plot of x, crossProbability
+            #don't have it plt.plot and plt.show at the end of everything
+
+            # calculate the pontential energy of new step
             v=self.V(x)
+
+
+
             if step%(500) and printFlag:
                 print('step: '+ str(step))
                 sys.stdout.flush()
             if self.plotting and step%(nSteps/10)==0:
                 plt.scatter(x,v)
+                plt.xlabel('Hydrogen-Water Bond Length (Angstrom)')
+                plt.ylabel('Probability of Recross Death')
                 xrange= np.linspace(np.min(x), np.max(x), num=5)
                 plt.plot(xrange,np.zeros((5))+v_ref)
                 plt.show()
             #Elimintation of a random selection of walkers in
             #the classically forbidden region
             N_r=np.random.random(N_size_step)
-            P_d=1-np.exp(-(v-v_ref)*self.dtau)
+            #rewrite into single exponential 
+            P_d=1-np.exp(-(v-v_ref)*self.dtau) # probability of death calculation (1-exponential function?)
+
             Diff=N_r-P_d
             mask_survive = (Diff>0)
             nDeaths=np.sum(np.array(Diff<0).astype(int))
@@ -170,9 +321,13 @@ class wavefunction:
             #recrossing correction for pop near node, only true for half harmonic PES
             if self.recrossing:
                 crossed=((x-dx)*x<0)
-                P_recrossDeath=np.exp(-2.0*(x-dx)*x*np.sqrt(self.mass*self.mass)/self.dtau) ##mass is reduced mass!
-                if self.plotting:
+                # P_recrossDeath=np.exp(-2.0*(x-dx)*x*np.sqrt(self.mass*self.mass)/self.dtau) ##mass is reduced mass! # change this line to my function results
+                P_recrossDeath = crossProbability # product of probability that the walker is too high + probability that the walker has crossed the nodal surface
+                if self.plotting and np.sum(P_recrossDeath)!=0:
                     plt.scatter(x,P_recrossDeath)
+                    plt.xlabel('Hydrogen-Water Bond Length (Angstrom)')
+                    plt.ylabel('Probability of Recross Death')
+
                     plt.show()
                 N_r_recross=np.random.random(N_size_step)
                 Diff=N_r_recross-P_recrossDeath
@@ -216,6 +371,8 @@ class wavefunction:
                 plt.scatter(x[mask_b],v[mask_b],c='blue',s=(P_exp_b[mask_b]*100.0)**2)
                 plt.scatter(x[(np.logical_not(mask_survive))],v[(np.logical_not(mask_survive))],c='red',s=(P_d[(np.logical_not(mask_survive))]*100.0)**2)
                 plt.plot([-1.0,1.0],[v_ref,v_ref],c='magenta')
+                plt.xlabel('Hydrogen-Water Bond Length (Angstrom)')
+                plt.ylabel('Probability')
                 #plt.quiver(x,v,dx,np.ones(N_size_step))
                 plt.show()
 
@@ -251,4 +408,3 @@ class wavefunction:
         N_size_step=x.shape[0]
         dx=np.random.normal(self.mu_dx, self.sigma_dx, N_size_step)
         return dx
-

@@ -9,7 +9,7 @@ au2wn=219474.63
 
 #The number of walkers
 nWalkers=10000
-H2Wfn=dmc.wavefunction(nWalkers,'Morse',plotting=False)
+H2Wfn=dmc.wavefunction(nWalkers,'harmonic',plotting=False)
 TheoreticalOmega0=H2Wfn.getTheoreticalOmega0()
 print('the theoretical frequency for H2 vibration is: '+str(TheoreticalOmega0)+' cm^-1')
 
@@ -52,7 +52,9 @@ vrefdw, popdw, xdw, descendants = H2Wfn.propagate(x0, 10)
 
 #graph normalized histogram of x0
 hist, bin_edges = np.histogram(x0, bins = 100)
-norm_hist = hist/x0.size
+# norm_hist = hist/x0.size
+print(np.size(x0))
+norm_hist = hist/np.size(x0)
 bin_edges = bin_edges
 norm_bin = ((bin_edges[:-1]+bin_edges[1:])/2)*0.529177249
 
@@ -121,7 +123,8 @@ for n in range(nReps-1):
     #plot normalized histogram of population's x value                                                                                                    
   
     hist, bin_edges = np.histogram(x0, bins = bin_edges)
-    norm_hist = hist/x0.size
+    # norm_hist = hist/x0.size
+    norm_hist = hist/np.size(x0)
     norm_bin = ((bin_edges[:-1]+bin_edges[1:])/2)*0.529177249
     
     ax1.plot(norm_bin, norm_hist,'o',color='{}'.format(1.0/(2**(n+2))), label='Run #{}'.format(n+2))

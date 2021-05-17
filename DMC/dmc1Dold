@@ -30,8 +30,8 @@ class wavefunction:
     def set_dtau(self):
         print('set dtau to be '+ str(10.0))
         return 10.0
-
     def get_dtau(self):
+        
         return self.dtau
 
     def set_mass(self,molecule1, molecule2, molecule3):
@@ -105,17 +105,17 @@ class wavefunction:
             v=0.5*k*(x*x)
         if self.potential=='half harmonic right':
             #v=0.5*k*(x*x) if x>0 else 100000
-            # inf=10000.0
+            inf=10000.0
             v=0.5*k*(x*x)
             mask=(x<0.0)
-            v[mask]=100*0.5*k*(1.3915484473258797*1.3915484473258797)
+            v[mask]=inf
             #v=[vb if c else vinf for (c,vb,vinf) in zip(x>0.0,0.5*k*(x*x),inf*np.ones(x.size))]
         if self.potential=='half harmonic left':
             #v=0.5*k*(x*x) if x>0 else 100000
-            # inf=10000.0
+            inf=10000.0
             v=0.5*k*(x*x)
             mask=(x>0.0)
-            v[mask]=100*0.5*k*(1.3915484473258797*1.3915484473258797)
+            v[mask]=inf
         if self.potential=='Morse':
             v=De*((1-np.exp(-1.0*a*(x-re)))**2)
             
@@ -127,7 +127,7 @@ class wavefunction:
         return v
 
 
-    #function propagate
+#function propagate
     def propagate(self,x,nSteps,setV_ref=False,ConstantV_ref=0,printCensus=False,nSize=0,plotWalkers=False,printFlag=False):
 
         descendants=np.zeros((x.size))  #not yet implemented
@@ -251,4 +251,3 @@ class wavefunction:
         N_size_step=x.shape[0]
         dx=np.random.normal(self.mu_dx, self.sigma_dx, N_size_step)
         return dx
-

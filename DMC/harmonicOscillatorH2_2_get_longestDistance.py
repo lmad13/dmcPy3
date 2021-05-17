@@ -16,9 +16,6 @@ rangedtau = 5
 #V averages rangedtau many times                                                                              
 vaverages = np.zeros(rangedtau)
 
-# X maximum
-maxX = 0
-
 #std V rangedtau many times                                                                                   
 stdvaverages = np.zeros(rangedtau)
 
@@ -27,7 +24,7 @@ dtaus = np.array([i+1 for i in range(rangedtau)])
 
 
 for i in range(rangedtau):
-    H2Wfn=dmc.wavefunction(nWalkers,'half harmonic right',plotting=False, ndtau=i+1)
+    H2Wfn=dmc.wavefunction(nWalkers,'harmonic',plotting=False, ndtau=i+1)
 
     TheoreticalOmega0=H2Wfn.getTheoreticalOmega0()
     print('the theoretical frequency for H2 vibration is: '+str(TheoreticalOmega0)+' cm^-1')
@@ -57,15 +54,16 @@ for i in range(rangedtau):
 
 #then simulate n times:                                                                                       
 
+
     for n in range(nReps):
+
     #propagate                                                                                                
         vref_0,pop,x0,d=H2Wfn.propagate(x0Equilibration,nSteps,plotWalkers=False,printFlag=False)
         vref_0=np.array(vref_0)
 
         average_energy = np.average(vref_0)
         standard_deviation = np.std(vref_0)
-        if np.amax(x0) > maxX:
-            maxX=np.amax(x0)
+
 
         print("Repetition: " + str(n))
         print("Average Energy:")
@@ -89,8 +87,6 @@ print('List of Average of Average Energy')
 print(vaverages)
 print('List of Std of Average Energy')
 print(stdvaverages)
-print('Maximum X*****')
-print(maxX)
 
 
 plt.errorbar(dtaus, vaverages, yerr=stdvaverages, color='orange', ecolor='green', capsize = 5, capthick=2, fmt='o')
@@ -99,3 +95,4 @@ plt.ylabel('V average')
 plt.title('V average vs dtau')
 plt.xticks(dtaus)
 plt.show()
+
